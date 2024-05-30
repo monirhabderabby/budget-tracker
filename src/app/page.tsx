@@ -1,7 +1,10 @@
-import Image from "next/image";
+import BannerImage from "@/components/hero/banner-image";
+import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const user = await currentUser();
+
   return (
     <div>
       <section className=" pb-10 flex flex-col items-center ">
@@ -22,21 +25,14 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
                 className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:shadow-2xl z-50 focus:outline-none focus:ring active:bg-amber-600 bg-gradient-to-r from-amber-400 to-orange-500 sm:w-auto"
-                href="/sign-in"
+                href={user ? "/dashboard" : "/sign-in"}
               >
-                Get Started Now
+                {user ? "Take me to the Dashboard" : "Get Started Now"}
               </Link>
             </div>
           </div>
         </div>
-        <Image
-          src="/dashboard.webp"
-          alt="dashboard"
-          width={1000}
-          height={700}
-          className="mt-5 rounded-xl border-2"
-          priority
-        />
+        <BannerImage />
       </section>
     </div>
   );

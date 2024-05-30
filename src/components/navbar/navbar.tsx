@@ -80,7 +80,7 @@ function MobileNavbar() {
     <div className=" block md:hidden border-separate bg-foreground">
       <nav
         className={cn(
-          "container flex items-center justify-between px-8",
+          "container flex items-center justify-between px-4",
           theme === "dark" ? "bg-black" : "bg-white"
         )}
       >
