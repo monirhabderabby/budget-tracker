@@ -29,7 +29,7 @@ const items = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const whiteList = ["/sign-in", "/sign-up"];
+  const whiteList = ["/sign-in", "/sign-up", "/wizerd"];
   if (whiteList.includes(pathname)) {
     return null;
   }
