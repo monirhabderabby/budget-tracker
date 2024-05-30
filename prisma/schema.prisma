@@ -15,7 +15,7 @@ datasource db {
 
 model UserSettings {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  userId   String
+  userId   String @unique
   currency String
 }
 
