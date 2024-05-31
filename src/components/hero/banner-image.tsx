@@ -10,7 +10,7 @@ const BannerImage = () => {
     <div>
       <div className="px-4">
         <Image
-          src={theme === "dark" ? dashboardBlack : dashboardWhite}
+          src={theme === "light" ? dashboardWhite : dashboardBlack}
           alt="dashboard"
           width={1000}
           height={700}
