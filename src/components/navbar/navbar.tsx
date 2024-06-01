@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -70,6 +70,7 @@ function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+  const { user } = useUser();
 
   useEffect(() => {
     setMounted(true);
@@ -91,17 +92,25 @@ function MobileNavbar() {
             </Button>
           </SheetTrigger>
           <SheetContent className="w-[400px] sm:w-[540px]" side="left">
-            <Logo />
-            <div className="flex flex-col gap-1 pt-4">
-              {items.map((item) => (
-                <NavbarItem
-                  key={item.label}
-                  label={item.label}
-                  link={item.link}
-                  onCLickEvent={() => setIsOpen((prev) => !prev)}
-                />
-              ))}
-            </div>
+            <section className="flex flex-col justify-between h-full pb-[50px]">
+              <div>
+                <Logo />
+                <div className="flex flex-col gap-1 pt-4">
+                  {items.map((item) => (
+                    <NavbarItem
+                      key={item.label}
+                      label={item.label}
+                      link={item.link}
+                      onCLickEvent={() => setIsOpen((prev) => !prev)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <UserButton afterSignOutUrl="/" />
+                <p className="text-muted-foreground text-xl">{`${user?.firstName} ${user?.lastName}`}</p>
+              </div>
+            </section>
           </SheetContent>
         </Sheet>
         <div className="flex h-[80px] min-h-[60px] items-center gap-x-4">
