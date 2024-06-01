@@ -67,3 +67,5 @@ model YearHistory {
 
   @@unique([month, year, userId])
 }
+
+// 2:28:42
