@@ -201,7 +201,6 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
                           mode="single"
                           selected={field.value}
                           onSelect={(value) => {
-                            console.log("@@Calender", value);
                             if (!value) return;
                             field.onChange(value);
                           }}
