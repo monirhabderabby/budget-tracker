@@ -29,7 +29,7 @@ export async function GET(req: Request, res: Response) {
     queryParams.data.to
   );
 
-  return stats;
+  return Response.json(stats);
 }
 
 export type GetBalanceStatsResponseType = Awaited<
