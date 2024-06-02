@@ -9,11 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import CurrencyComboBox from "@/components/ui/currency-combobox";
+import { Separator } from "@/components/ui/separator";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { TransactionType } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { Category } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { PlusSquare, TrendingDown, TrendingUp } from "lucide-react";
+import { PlusSquare, TrashIcon, TrendingDown, TrendingUp } from "lucide-react";
 import CreateCategoryDialog from "../dashboard/_components/create-category-dialog";
+import DeleteCategoryDialog from "../dashboard/_components/delete-category-dialog";
 
 const Page = () => {
   return (
@@ -49,13 +53,15 @@ const Page = () => {
 export default Page;
 
 function CategoryList({ type }: { type: TransactionType }) {
-  const categoriesQuery = useQuery({
+  const categoriesQuery = useQuery<Category[]>({
     queryKey: ["categories", type],
     queryFn: () =>
       fetch(`/api/categories?type=${type}`).then((res) => res.json()),
   });
+
+  const dataAvailable = categoriesQuery.data && categoriesQuery.data.length > 0;
   return (
-    <SkeletonWrapper isLoading={categoriesQuery.isFetching}>
+    <SkeletonWrapper isLoading={categoriesQuery.isLoading}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-2">
@@ -87,9 +93,59 @@ function CategoryList({ type }: { type: TransactionType }) {
             />
           </CardTitle>
         </CardHeader>
+        <Separator />
+        {!dataAvailable && (
+          <div className="flex h-40 w-full flex-col items-center justify-center">
+            <p>
+              No{" "}
+              <span
+                className={cn(
+                  "m-1 ",
+                  type === "income" ? "text-emerald-500" : "text-red-500"
+                )}
+              >
+                {type}
+              </span>
+              categories yet
+            </p>
+            <p className="text-sm text-muted-foreground ">
+              Create one to get started
+            </p>
+          </div>
+        )}
+        {dataAvailable && (
+          <div className="grid grid-flow-row gap-2 p-2 sm:grid-flow-row sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            {categoriesQuery?.data?.map((category: Category) => (
+              <CategoryCard category={category} key={category.id} />
+            ))}
+          </div>
+        )}
       </Card>
     </SkeletonWrapper>
   );
 }
 
-// 3:56
+function CategoryCard({ category }: { category: Category }) {
+  return (
+    <div className="flex border-separate flex-col justify-between rounded-md border shadow-sm shadow-black/[0.1] dark:shadow-white/[0.1]">
+      <div className="flex flex-col items-center gap-2 p-4">
+        <span className="text-3xl " role="img">
+          {category.icon}
+        </span>
+        <span>{category.name}</span>
+      </div>
+      <DeleteCategoryDialog
+        category={category}
+        trigger={
+          <Button
+            className="flex w-full border-separate items-center gap-2 rounded-t-none text-muted-foreground hover:bg-red-500/20"
+            variant="secondary"
+          >
+            <TrashIcon className="w-4 h-4" />
+            Remove
+          </Button>
+        }
+      />
+    </div>
+  );
+}
