@@ -46,7 +46,7 @@ import { CreateCategory } from "../_actions/categories";
 interface Props {
   type: TransactionType;
   successCallback: (category: Category) => void;
-  trigger: ReactNode;
+  trigger?: ReactNode;
 }
 
 const CreateCategoryDialog = ({ type, successCallback, trigger }: Props) => {
