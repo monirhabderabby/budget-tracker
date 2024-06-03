@@ -29,7 +29,7 @@ const CategoriesStats = ({ from, to, userSettings }: Props) => {
 
   const formatter = useMemo(() => {
     return GetFormatterForCurrency(userSettings.currency);
-  }, []);
+  }, [userSettings.currency]);
   return (
     <div className="flex w-full flex-wrap gap-2 md:flex-nowrap">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
