@@ -11,6 +11,7 @@ const TransactionPage = () => {
     from: startOfMonth(new Date()),
     to: new Date(),
   });
+
   return (
     <>
       <div className="border-b bg-card">
