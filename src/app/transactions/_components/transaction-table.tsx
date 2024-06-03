@@ -5,6 +5,7 @@ import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DataTableViewOptions } from "@/components/data-table/column-toggle";
 import { DataTableFacetedFilter } from "@/components/data-table/faceted-filters";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +38,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { DownloadIcon, MoreHorizontal, Trash } from "lucide-react";
+import { DownloadIcon, MoreHorizontal, Trash, TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import DeleteTransactionDialog from "./delete-transaction-dialog";
 
@@ -48,9 +49,33 @@ interface Props {
 
 const emptyData: any[] = [];
 
+type TableType = ReturnType<typeof useReactTable>;
+
 type TransactionHistoryRow = GetTransactionsHistoryType[0];
 
 const columns: ColumnDef<TransactionHistoryRow>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "category",
     header: ({ column }) => (
@@ -147,6 +172,9 @@ const csvConfig = mkConfig({
 const TransactionTable = ({ from, to }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = useState({});
+
+  // API CALL
   const history = useQuery<GetTransactionsHistoryType>({
     queryKey: ["transactions", "history", from, to],
     queryFn: () =>
@@ -169,13 +197,20 @@ const TransactionTable = ({ from, to }: Props) => {
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: setRowSelection,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  // selected rows >> Arrays of Ids
+  const selectedRowIds = table
+    .getFilteredSelectedRowModel()
+    .rows.map((item) => item.original.id);
 
   const categoriesOptions = useMemo(() => {
     const categoriesMap = new Map();
@@ -236,6 +271,7 @@ const TransactionTable = ({ from, to }: Props) => {
             Export CSV
           </Button>
           <DataTableViewOptions table={table} />
+          <BulkDeleteButton rowIds={selectedRowIds} table={table} />
         </div>
       </div>
       <SkeletonWrapper isLoading={history.isFetching}>
@@ -321,7 +357,8 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
       <DeleteTransactionDialog
         open={showDeleteDialog}
         setOpen={setShowDeleteDialog}
-        transactionId={transaction.id}
+        transactionIds={[transaction.id]}
+        deletionType="single"
       />
       <DropdownMenu>
         <DropdownMenuTrigger>
@@ -343,6 +380,39 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+    </>
+  );
+}
+
+function BulkDeleteButton({
+  rowIds,
+  table,
+}: {
+  rowIds: string[];
+  table: TableType;
+}) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  return (
+    <>
+      <DeleteTransactionDialog
+        open={showDeleteDialog}
+        setOpen={setShowDeleteDialog}
+        transactionIds={rowIds}
+        deletionType="bulk"
+      />
+      <Button
+        variant="outline"
+        size="sm"
+        className="ml-auto h-8 lg:flex"
+        onClick={() => {
+          setShowDeleteDialog((prev) => !prev);
+        }}
+        disabled={table.getFilteredSelectedRowModel().rows.length === 0}
+      >
+        <TrashIcon className="mr-2 h-4 w-4" />
+        Delete All
+      </Button>
     </>
   );
 }

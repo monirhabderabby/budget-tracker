@@ -5,6 +5,8 @@ import Link from "next/link";
 export default async function Home() {
   const user = await currentUser();
 
+  console.log(user?.id);
+
   return (
     <div>
       <section className=" pb-10 flex flex-col items-center ">
