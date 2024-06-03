@@ -72,7 +72,9 @@ function CategoryList({ type }: { type: TransactionType }) {
                 <TrendingUp className="h-12 w-12 items-center rounded-lg bg-emerald-400/10 p-2 text-emerald-500" />
               )}
               <div>
-                {type === "income" ? "Income" : "Expense"} categories{" "}
+                <p className="text-[18px] md:text-[20px]">
+                  {type === "income" ? "Income" : "Expense"} categories
+                </p>
                 <div className="text-sm text-muted-foreground">
                   Sorted by name
                 </div>
@@ -85,7 +87,7 @@ function CategoryList({ type }: { type: TransactionType }) {
                 categoriesQuery.refetch();
               }}
               trigger={
-                <Button className="gap-2 text-sm">
+                <Button className="gap-2 text-sm" size="sm">
                   <PlusSquare className="h-4 w-4" />
                   Create category
                 </Button>
