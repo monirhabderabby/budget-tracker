@@ -6,6 +6,7 @@ import dashboardWhite from "../../../public/dash-white.webp";
 
 const BannerImage = () => {
   const { theme } = useTheme();
+
   return (
     <div>
       <div className="px-4">

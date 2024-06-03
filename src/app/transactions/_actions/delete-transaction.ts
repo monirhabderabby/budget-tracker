@@ -76,3 +76,88 @@ export async function DeleteTransaction(id: string) {
     }),
   ]);
 }
+
+export async function bulkDelete(ids: string[]) {
+  const user = await currentUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const allTransactions = await prisma.transaction.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+      userId: user.id,
+    },
+  });
+
+  const deleteTransactionOperation = prisma.transaction.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+      userId: user.id,
+    },
+  });
+
+  // Create monthHistory update operations
+  const monthHistoryOperations = allTransactions.map((transaction) =>
+    prisma.monthHistory.update({
+      where: {
+        day_month_year_userId: {
+          userId: user.id,
+          day: transaction.date.getUTCDate(),
+          month: transaction.date.getUTCMonth(),
+          year: transaction.date.getUTCFullYear(),
+        },
+      },
+      data: {
+        ...(transaction.type === "expense" && {
+          expense: {
+            decrement: transaction.amount,
+          },
+        }),
+        ...(transaction.type === "income" && {
+          income: {
+            decrement: transaction.amount,
+          },
+        }),
+      },
+    })
+  );
+
+  // Create yearHistory update operations
+  const yearHistoryOperations = allTransactions.map((transaction) =>
+    prisma.yearHistory.update({
+      where: {
+        month_year_userId: {
+          userId: user.id,
+          month: transaction.date.getUTCMonth(),
+          year: transaction.date.getUTCFullYear(),
+        },
+      },
+      data: {
+        ...(transaction.type === "expense" && {
+          expense: {
+            decrement: transaction.amount,
+          },
+        }),
+        ...(transaction.type === "income" && {
+          income: {
+            decrement: transaction.amount,
+          },
+        }),
+      },
+    })
+  );
+
+  // Combine all operations into a single transaction
+  const result = await prisma.$transaction([
+    deleteTransactionOperation,
+    ...monthHistoryOperations,
+    ...yearHistoryOperations,
+  ]);
+
+  return result;
+}
