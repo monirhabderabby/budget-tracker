@@ -21,7 +21,7 @@ import {
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Currencies, Currency } from "@/lib/currency";
 import { UserSettings } from "@prisma/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import SkeletonWrapper from "./skeleton-wrapper";
 
@@ -36,6 +36,8 @@ export default function CurrencyComboBox() {
     queryKey: ["userSettings"],
     queryFn: () => fetch("/api/user-settings").then((res) => res.json()),
   });
+
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     if (!userSettings.data) return;
@@ -58,6 +60,10 @@ export default function CurrencyComboBox() {
       setSelectedOption(
         Currencies.find((c) => c.value === data.currency) || null
       );
+
+      queryClient.invalidateQueries({
+        queryKey: ["stats", "overview", "history"],
+      });
     },
     onError: () => {
       toast.error("Something went wrong", {
