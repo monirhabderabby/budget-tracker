@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { ReactNode, useState } from "react";
+import NProgress from "./NProgress";
 
 const RootProvider = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient({}));
@@ -15,6 +16,7 @@ const RootProvider = ({ children }: { children: ReactNode }) => {
         enableSystem={false}
         disableTransitionOnChange
       >
+        <NProgress />
         {children}
       </NextThemesProvider>
       <ReactQueryDevtools initialIsOpen={false} />
