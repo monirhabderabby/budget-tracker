@@ -1,11 +1,10 @@
-import BannerImage from "@/components/hero/banner-image";
+const BannerImage = dynamic(() => import("@/components/hero/banner-image"));
 import { currentUser } from "@clerk/nextjs/server";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 export default async function Home() {
   const user = await currentUser();
-
-  console.log(user?.id);
 
   return (
     <div>

@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
-import CreateTransactionDialog from "./_components/create-transaction-dialog";
-import History from "./_components/history";
-import OverView from "./_components/overview";
+const History = dynamic(() => import("./_components/history"));
+const OverView = dynamic(() => import("./_components/overview"));
+const CreateTransactionDialog = dynamic(
+  () => import("./_components/create-transaction-dialog")
+);
 
 const Dashboard = async () => {
   const user = await currentUser();
