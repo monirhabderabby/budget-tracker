@@ -33,12 +33,17 @@ export type GetCategoriesStatsResponseType = Awaited<
 >;
 
 async function getCategoriesStats(userId: string, from: Date, to: Date) {
+  const dateObj = new Date(from);
+  const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+  const previousDay = new Date(dateObj.getTime() - oneDayInMilliseconds);
+  const previousDayStr = previousDay.toISOString();
+
   const stats = await prisma.transaction.groupBy({
     by: ["type", "category", "categoryIcon"],
     where: {
       userId,
       date: {
-        gte: from,
+        gte: previousDayStr,
         lte: to,
       },
     },
