@@ -29,6 +29,7 @@ const BankStats = ({ userSettings }: Props) => {
         <SkeletonWrapper isLoading={bankListQuery.isFetching}>
           {bankListQuery.data?.map((account: Account) => (
             <StatCard
+              key={account.id}
               name={account.accountName}
               logo={account.accountLogo}
               amount={account.amount}
