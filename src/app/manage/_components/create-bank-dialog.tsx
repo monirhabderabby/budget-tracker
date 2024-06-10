@@ -62,7 +62,6 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
       form.reset({
         accountLogo: "",
         accountName: "",
-        amount: 0,
       });
       successCallback(data);
 
@@ -132,21 +131,6 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
                   </FormControl>
                   <FormDescription>
                     This is will be your account name
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Initial Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    How much amount you have now
                   </FormDescription>
                 </FormItem>
               )}

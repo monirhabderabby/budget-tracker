@@ -23,7 +23,7 @@ export const addBankAccount = async (data: CreateBankSchemaType) => {
       userId: user.id,
       accountName: parsedBody.data?.accountName,
       accountLogo: parsedBody.data.accountLogo,
-      amount: parsedBody.data.amount,
+      amount: 0,
     },
   });
 };
