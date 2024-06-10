@@ -26,7 +26,7 @@ model Account {
   accountLogo String
   amount      Int
 
-  transaction Transaction?
+  transaction Transaction[]
 
   createdAt DateTime @default(now())
 
@@ -54,7 +54,7 @@ model Transaction {
   type         String   @default("income")
   category     String
   categoryIcon String
-  accountId    String   @unique @db.ObjectId
+  accountId    String   @db.ObjectId
 
   account Account @relation(fields: [accountId], references: [id])
 

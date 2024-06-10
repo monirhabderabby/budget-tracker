@@ -95,6 +95,12 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
 
       setOpen((prev) => !prev);
     },
+    onError: (error) => {
+      toast.error(error.message, {
+        id: "create-transaction",
+      });
+      console.log();
+    },
   });
 
   const onSubmit = useCallback(
