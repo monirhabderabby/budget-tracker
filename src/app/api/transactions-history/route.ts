@@ -65,6 +65,9 @@ async function getTransactionsHistory(userId: string, from: Date, to: Date) {
     orderBy: {
       date: "desc",
     },
+    include: {
+      account: true,
+    },
   });
 
   return transactions.map((transaction) => ({

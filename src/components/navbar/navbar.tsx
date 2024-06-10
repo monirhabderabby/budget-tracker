@@ -25,6 +25,10 @@ const items = [
     label: "Manage",
     link: "/manage",
   },
+  {
+    label: "Bank",
+    link: "/bank",
+  },
 ];
 
 const Navbar = () => {

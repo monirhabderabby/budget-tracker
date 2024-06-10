@@ -19,6 +19,20 @@ model UserSettings {
   currency String
 }
 
+model Account {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  accountName String
+  accountLogo String
+  amount      Int
+
+  transaction Transaction?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, accountName])
+}
+
 model Category {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   userId String
@@ -33,13 +47,16 @@ model Category {
 
 model Transaction {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  amount       Float
+  amount       Int
   description  String
   date         DateTime
   userId       String
   type         String   @default("income")
   category     String
   categoryIcon String
+  accountId    String   @unique @db.ObjectId
+
+  account Account @relation(fields: [accountId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
