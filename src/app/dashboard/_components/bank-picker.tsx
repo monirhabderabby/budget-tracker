@@ -1,5 +1,6 @@
 "use client";
 
+import CreateBankDialog from "@/app/manage/_components/create-bank-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -16,18 +17,18 @@ import {
 } from "@/components/ui/popover";
 import { TransactionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Category } from "@prisma/client";
+import { Account } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import CreateCategoryDialog from "./create-category-dialog";
 
 interface Props {
   type: TransactionType;
   onChange: (value: string) => void;
 }
 
-const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
+const BankPicker: React.FC<Props> = ({ type, onChange }) => {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
@@ -41,15 +42,14 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
     onChange(value);
   }, [value, onChange]);
 
-  const categoriesQuery = useQuery<Category[]>({
-    queryKey: ["categories", type],
-    queryFn: () =>
-      fetch(`/api/categories?type=${type}`).then((res) => res.json()),
+  const bankListQuery = useQuery<Account[]>({
+    queryKey: ["banks"],
+    queryFn: () => fetch(`/api/bank`).then((res) => res.json()),
   });
 
   const successCallbak = useCallback(
-    (category: Category) => {
-      setValue(category.name);
+    (account: Account) => {
+      setValue(account.id);
       setOpen((prev) => !prev);
     },
     [setValue, setOpen]
@@ -60,8 +60,8 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
 
   if (!mounted) return null;
 
-  const selectedCategory = categoriesQuery.data?.find(
-    (category: Category) => category.name === value
+  const selectedBankList = bankListQuery.data?.find(
+    (account: Account) => account.id === value
   );
 
   return (
@@ -73,8 +73,8 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
           aria-expanded={open}
           className={cn("w-full justify-between")}
         >
-          {selectedCategory ? (
-            <CategoryRow category={selectedCategory} />
+          {selectedBankList ? (
+            <BankRow account={selectedBankList} />
           ) : (
             "Select category"
           )}
@@ -88,7 +88,7 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
           }}
         >
           <CommandInput placeholder="Search category..." />
-          <CreateCategoryDialog type={type} successCallback={successCallbak} />
+          <CreateBankDialog successCallback={successCallbak} />
           <CommandEmpty>
             <p>Category not found</p>
             <p className="text-xs text-muted-foreground">
@@ -97,20 +97,20 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
           </CommandEmpty>
           <CommandGroup>
             <CommandList>
-              {categoriesQuery.data &&
-                categoriesQuery.data.map((category: Category) => (
+              {bankListQuery.data &&
+                bankListQuery.data.map((account: Account) => (
                   <CommandItem
-                    key={category.id}
+                    key={account.id}
                     onSelect={(currentvalue) => {
-                      setValue(category.name);
+                      setValue(account.id);
                       setOpen((prev) => !prev);
                     }}
                   >
-                    <CategoryRow category={category} />
+                    <BankRow account={account} />
                     <Check
                       className={cn(
                         "mr-2 w-4 h-4 opacity-0",
-                        value === category.name && "opacity-100"
+                        value === account.accountName && "opacity-100"
                       )}
                     />
                   </CommandItem>
@@ -123,13 +123,18 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
   );
 };
 
-export default CategoryPicker;
+export default BankPicker;
 
-function CategoryRow({ category }: { category: Category }) {
+function BankRow({ account }: { account: Account }) {
   return (
     <div className="flex items-center gap-2">
-      <span role="img">{category.icon}</span>
-      <span>{category.name}</span>
+      <Image
+        width={40}
+        height={40}
+        src={account.accountLogo}
+        alt={account.accountName}
+      />
+      <span>{account.accountName}</span>
     </div>
   );
 }

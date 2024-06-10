@@ -41,6 +41,7 @@ import { ReactNode, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { CreateTransaction } from "../_actions/transaction";
+import BankPicker from "./bank-picker";
 import CategoryPicker from "./category-picker";
 
 interface Props {
@@ -63,6 +64,12 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
     },
     [form]
   );
+  const handleBankChange = useCallback(
+    (id: string) => {
+      form.setValue("accountId", id);
+    },
+    [form]
+  );
 
   const queryClient = useQueryClient();
 
@@ -79,6 +86,7 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
         amount: 0,
         date: new Date(),
         category: undefined,
+        accountId: "",
       });
 
       queryClient.invalidateQueries({
@@ -137,22 +145,22 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} defaultValue={0} />
-                  </FormControl>
-                  <FormDescription>
-                    Transaction amount (required)
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
             <div className="flex items-center justify-between gap-2 w-full">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col flex-1">
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} defaultValue={0} />
+                    </FormControl>
+                    <FormDescription>
+                      Transaction amount (required)
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="category"
@@ -166,23 +174,26 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
                       />
                     </FormControl>
                     <FormDescription>
-                      Select a category for this transaction
+                      Category for this transaction
                     </FormDescription>
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="flex items-center justify-between gap-2 w-full">
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col ">
+                  <FormItem className="flex flex-col flex-1">
                     <FormLabel>Transaction Data</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             className={cn(
-                              "w-[200px] pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                             variant="outline"
@@ -211,6 +222,19 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
 
                     <FormDescription>Select a date for this</FormDescription>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="accountId"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col flex-1">
+                    <FormLabel>Account</FormLabel>
+                    <FormControl>
+                      <BankPicker type={type} onChange={handleBankChange} />
+                    </FormControl>
+                    <FormDescription>Bank for this transaction</FormDescription>
                   </FormItem>
                 )}
               />

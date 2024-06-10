@@ -39,6 +39,7 @@ import {
 } from "@tanstack/react-table";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { DownloadIcon, MoreHorizontal, Trash, TrashIcon } from "lucide-react";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import DeleteTransactionDialog from "./delete-transaction-dialog";
 
@@ -90,6 +91,30 @@ const columns: ColumnDef<TransactionHistoryRow>[] = [
       <div className="flex gap-2 capitalize">
         {row.original.categoryIcon}{" "}
         <div className="capitalize">{row.original.category}</div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "bank",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Bank" />
+    ),
+
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+
+    cell: ({ row }) => (
+      <div
+        className="flex justify-star capitalize"
+        title={row.original.account.accountName}
+      >
+        <Image
+          src={row.original.account.accountLogo}
+          width={50}
+          height={50}
+          alt={row.original.account.accountName}
+        />
       </div>
     ),
   },
