@@ -26,12 +26,13 @@ import { useCallback, useEffect, useState } from "react";
 interface Props {
   type: TransactionType;
   onChange: (value: string) => void;
+  defaultSelect?: string;
 }
 
-const BankPicker: React.FC<Props> = ({ type, onChange }) => {
+const BankPicker: React.FC<Props> = ({ type, onChange, defaultSelect }) => {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultSelect || "");
 
   useEffect(() => {
     if (!value) {
@@ -110,7 +111,7 @@ const BankPicker: React.FC<Props> = ({ type, onChange }) => {
                     <Check
                       className={cn(
                         "mr-2 w-4 h-4 opacity-0",
-                        value === account.accountName && "opacity-100"
+                        value === account.id && "opacity-100"
                       )}
                     />
                   </CommandItem>

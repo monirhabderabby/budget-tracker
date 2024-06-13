@@ -68,8 +68,8 @@ model MonthHistory {
   day     Int
   month   Int
   year    Int
-  income  Float
-  expense Float
+  income  Int
+  expense Int
 
   @@unique([day, month, year, userId])
 }
@@ -79,8 +79,8 @@ model YearHistory {
   userId  String
   month   Int
   year    Int
-  income  Float
-  expense Float
+  income  Int
+  expense Int
 
   @@unique([month, year, userId])
 }

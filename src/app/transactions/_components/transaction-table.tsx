@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DateToUTCDate } from "@/lib/helpers";
+import { TransactionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -38,10 +39,17 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { DownloadIcon, MoreHorizontal, Trash, TrashIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+  TrashIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import DeleteTransactionDialog from "./delete-transaction-dialog";
+import UpdateTransactionDialog from "./update-transaction-dialog";
 
 interface Props {
   from: Date;
@@ -377,14 +385,23 @@ export default TransactionTable;
 
 function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   return (
-    <>
+    <div className="items-center flex">
       <DeleteTransactionDialog
         open={showDeleteDialog}
         setOpen={setShowDeleteDialog}
         transactionIds={[transaction.id]}
         deletionType="single"
       />
+      {showEditDialog && (
+        <UpdateTransactionDialog
+          type={transaction.type as TransactionType}
+          initialData={transaction}
+          open={showEditDialog}
+          setOpen={() => setShowEditDialog((prev) => !prev)}
+        />
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -403,9 +420,15 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
           >
             <Trash className="h-4 w-4 text-muted-foreground" /> Delete
           </DropdownMenuItem>
+          <DropdownMenuItem
+            className="flex items-center gap-2"
+            onSelect={() => setShowEditDialog((prev) => !prev)}
+          >
+            <Pencil className="h-4 w-4 text-muted-foreground" /> Edit
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 }
 

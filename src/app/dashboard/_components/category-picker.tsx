@@ -25,12 +25,13 @@ import CreateCategoryDialog from "./create-category-dialog";
 interface Props {
   type: TransactionType;
   onChange: (value: string) => void;
+  defaultSelect?: string;
 }
 
-const CategoryPicker: React.FC<Props> = ({ type, onChange }) => {
+const CategoryPicker: React.FC<Props> = ({ type, onChange, defaultSelect }) => {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultSelect || "");
 
   useEffect(() => {
     if (!value) {
