@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { TransactionType } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -20,6 +21,8 @@ export async function DeleteTransaction(id: string) {
   if (!transaction) {
     throw new Error("bad request");
   }
+
+  // update account
 
   await prisma.$transaction([
     // Delete transaction from db
@@ -74,20 +77,40 @@ export async function DeleteTransaction(id: string) {
         }),
       },
     }),
-
-    // update account
-    prisma.account.update({
-      where: {
-        userId: user.id,
-        id: transaction.accountId,
-      },
-      data: {
-        amount: {
-          decrement: transaction.amount,
-        },
-      },
-    }),
   ]);
+
+  switch (transaction.type as TransactionType) {
+    case "income":
+      await prisma.account.update({
+        where: {
+          userId: user.id,
+          id: transaction.accountId,
+        },
+        data: {
+          amount: {
+            decrement: transaction.amount || 0,
+          },
+        },
+      });
+      return;
+
+    case "expense":
+      await prisma.account.update({
+        where: {
+          userId: user.id,
+          id: transaction.accountId,
+        },
+        data: {
+          amount: {
+            increment: transaction.amount || 0,
+          },
+        },
+      });
+      return;
+
+    default:
+      break;
+  }
 }
 
 export async function bulkDelete(ids: string[]) {
