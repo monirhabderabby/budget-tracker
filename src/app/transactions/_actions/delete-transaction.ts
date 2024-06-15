@@ -188,11 +188,49 @@ export async function bulkDelete(ids: string[]) {
     })
   );
 
+  // Group transactions by accountId and type to create account update operations
+
+  interface AccountUpdate {
+    accountId: string;
+    type: "income" | "expense";
+    amount: number;
+  }
+  const accountUpdates = allTransactions.reduce<Record<string, AccountUpdate>>(
+    (acc, transaction) => {
+      const key = `${transaction.accountId}-${transaction.type}`;
+      if (!acc[key]) {
+        acc[key] = {
+          accountId: transaction.accountId,
+          type: transaction.type as TransactionType,
+          amount: 0,
+        };
+      }
+      acc[key].amount += transaction.amount;
+      return acc;
+    },
+    {}
+  );
+
+  const accountOperations = Object.values(accountUpdates).map(
+    ({ accountId, type, amount }) =>
+      prisma.account.update({
+        where: {
+          userId: user.id,
+          id: accountId,
+        },
+        data: {
+          amount:
+            type === "income" ? { decrement: amount } : { increment: amount },
+        },
+      })
+  );
+
   // Combine all operations into a single transaction
   const result = await prisma.$transaction([
     deleteTransactionOperation,
     ...monthHistoryOperations,
     ...yearHistoryOperations,
+    ...accountOperations,
   ]);
 
   return result;
