@@ -174,10 +174,8 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
     previousDate.getFullYear() !== date.getFullYear();
   const isTransactedWithSameAccount = accountId === previousAccountId;
 
-  console.log("@@isDateChanged", isDateChanged);
-
-  // LOGIC #1: Update the transaction. [GET CATEGORY FIRST]
-
+  // LOGIC #1: Update the transaction.
+  // Action 1: {GET CATEGORY}
   const categoryRow = await prisma.category.findFirst({
     where: {
       userId: user.id,
@@ -189,7 +187,8 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
     throw new Error("category not found!");
   }
 
-  // LOGIC #1 > Action-1
+  // LOGIC #1:
+  // Action 2: update the trancsaction
   const transactionUpdateResult = await prisma.transaction.update({
     where: {
       userId: user.id,
