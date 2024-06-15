@@ -74,6 +74,19 @@ export async function DeleteTransaction(id: string) {
         }),
       },
     }),
+
+    // update account
+    prisma.account.update({
+      where: {
+        userId: user.id,
+        id: transaction.accountId,
+      },
+      data: {
+        amount: {
+          decrement: transaction.amount,
+        },
+      },
+    }),
   ]);
 }
 

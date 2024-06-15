@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteTransaction, bulkDelete } from "../_actions/delete-transaction";
 
@@ -27,17 +28,13 @@ function DeleteTransactionDialog({
   transactionIds,
   deletionType,
 }: Props) {
-  // Identify toast identified for toast loader ID
-  let toastIdentifier;
-  toastIdentifier = deletionType === "single" && "single-transaction-delete";
-  toastIdentifier = deletionType === "bulk" && "bulk-transaction-delete";
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: DeleteTransaction,
     onSuccess: async () => {
       toast.success("Transaction deleted successfully", {
-        id: toastIdentifier as string,
+        id: deletionType === "single" ? "single" : "bilk",
       });
 
       await queryClient.invalidateQueries({
@@ -46,7 +43,7 @@ function DeleteTransactionDialog({
     },
     onError: (error) => {
       toast.error(error.message || "Something went wrong", {
-        id: toastIdentifier as string,
+        id: deletionType === "single" ? "single" : "bilk",
       });
     },
   });
@@ -55,7 +52,7 @@ function DeleteTransactionDialog({
     mutationFn: bulkDelete,
     onSuccess: async (data) => {
       toast.success("Transactions deleted successfully", {
-        id: toastIdentifier as string,
+        id: deletionType === "single" ? "single" : "bilk",
       });
 
       await queryClient.invalidateQueries({
@@ -65,7 +62,7 @@ function DeleteTransactionDialog({
 
     onError: (error) => {
       toast.error(error.message, {
-        id: toastIdentifier as string,
+        id: deletionType === "single" ? "single" : "bilk",
       });
     },
   });
@@ -76,7 +73,7 @@ function DeleteTransactionDialog({
         ? "Deleting selected transaction..."
         : "Deleting transaction...";
     toast.loading(loaderText, {
-      id: toastIdentifier as string,
+      id: deletionType === "single" ? "single" : "bilk",
     });
 
     if (deletionType === "single") {
@@ -107,8 +104,17 @@ function DeleteTransactionDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={transactionDeleteAction}>
-            Continue
+          <AlertDialogAction
+            disabled={deleteMutation.isPending || bulkDeleteMutation.isPending}
+            onClick={transactionDeleteAction}
+          >
+            Continue{" "}
+            {deleteMutation.isPending ||
+              (bulkDeleteMutation.isPending && (
+                <span className="ml-2 duration-300">
+                  <Loader2 className="animate-spin h-4 w-4 text-muted" />
+                </span>
+              ))}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
