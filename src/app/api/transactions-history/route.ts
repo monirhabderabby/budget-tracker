@@ -4,9 +4,6 @@ import { overviewQuerySchema } from "@/schema/overview";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-// Export the runtime config to specify that this route should be handled by the edge
-export const runtime = "edge";
-
 export async function GET(req: Request) {
   const user = await currentUser();
 
