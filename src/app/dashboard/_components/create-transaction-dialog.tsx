@@ -37,12 +37,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { ReactNode, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { CreateTransaction } from "../_actions/transaction";
-import BankPicker from "./bank-picker";
-import CategoryPicker from "./category-picker";
+const CategoryPicker = dynamic(() => import("./category-picker"), {
+  ssr: false,
+});
+const BankPicker = dynamic(() => import("./bank-picker"), {
+  ssr: false,
+});
 
 interface Props {
   trigger: ReactNode;

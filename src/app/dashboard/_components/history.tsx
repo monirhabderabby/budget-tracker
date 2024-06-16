@@ -8,6 +8,7 @@ import { Period, TimeframeType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { UserSettings } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import CountUp from "react-countup";
 import {
@@ -19,7 +20,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import HistoryPeriodSelector from "./history-period-selector";
+const HistoryPeriodSelector = dynamic(
+  () => import("./history-period-selector"),
+  { ssr: false }
+);
 
 const History = ({ userSettings }: { userSettings: UserSettings }) => {
   const [timeframe, setTimeframe] = useState<TimeframeType>("month");

@@ -7,8 +7,10 @@ import { differenceInDays, startOfMonth } from "date-fns";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { toast } from "sonner";
-const StatsCards = dynamic(() => import("./stats-cards"));
-const CategoriesStats = dynamic(() => import("./categories-stats"));
+const StatsCards = dynamic(() => import("./stats-cards"), { ssr: false });
+const CategoriesStats = dynamic(() => import("./categories-stats"), {
+  ssr: false,
+});
 
 interface Props {
   userSettings: UserSettings;
