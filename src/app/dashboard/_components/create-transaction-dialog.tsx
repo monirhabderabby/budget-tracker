@@ -105,10 +105,6 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
 
   const onSubmit = useCallback(
     (values: CreateTransactionSchemaType) => {
-      toast.loading("Creating transaction...", {
-        id: "create-transaction",
-      });
-
       mutate({
         ...values,
         date: DateToUTCDate(values.date),
@@ -259,9 +255,18 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+          <Button
+            className="mb-2 md:mb-0"
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={isPending}
+          >
             {!isPending && "Create"}
-            {isPending && <Loader2 className="animate-spin" />}
+            {isPending && (
+              <span className="flex items-center gap-x-3">
+                <Loader2 className="animate-spin h-4 w-4" />
+                Saving
+              </span>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
