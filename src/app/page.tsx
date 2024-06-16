@@ -1,4 +1,5 @@
 const BannerImage = dynamic(() => import("@/components/hero/banner-image"));
+import TextSwipe from "@/components/animation/text-swipe";
 import { currentUser } from "@clerk/nextjs/server";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -11,8 +12,10 @@ export default async function Home() {
       <section className=" pb-10 flex flex-col items-center ">
         <div className="mx-auto max-w-7xl px-4 py-32">
           <div className="mx-auto max-w-xl text-center">
-            <h1 className="text-3xl font-extrabold sm:text-5xl">
-              Manage Your Expense.
+            <h1 className="text-3xl font-extrabold sm:text-5xl ">
+              <div className="flex items-center gap-x-4">
+                Manage Your <TextSwipe />
+              </div>
               <strong className="font-extrabold text-primary sm:block">
                 {" "}
                 Control your Money.{" "}

@@ -15,7 +15,7 @@ const BannerImage = () => {
           alt="dashboard"
           width={1000}
           height={700}
-          className="mt-5 rounded-xl border-2"
+          className="mt-5 rounded-xl border-2 duration-300 hover:border-white/20"
           priority
           placeholder="blur"
         />

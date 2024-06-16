@@ -1,14 +1,18 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
-import { GetFormatterForCurrency } from "@/lib/helpers";
+// Packages
 import { Account, UserSettings } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useCallback, useMemo } from "react";
 import CountUp from "react-countup";
 
+// Components
+import { Card } from "@/components/ui/card";
+import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
+import { GetFormatterForCurrency } from "@/lib/helpers";
+import { useQuery } from "@tanstack/react-query";
+
+// Types for params
 interface Props {
   userSettings: UserSettings;
 }
@@ -17,6 +21,7 @@ const BankStats = ({ userSettings }: Props) => {
   const bankListQuery = useQuery<Account[]>({
     queryKey: ["banks"],
     queryFn: () => fetch(`/api/bank`).then((res) => res.json()),
+    refetchOnReconnect: true,
   });
 
   const formatter = useMemo(() => {
@@ -26,7 +31,7 @@ const BankStats = ({ userSettings }: Props) => {
   return (
     <div>
       <div className=" relative flex w-full flex-wrap gap-3 md:flex-nowrap py-6">
-        <SkeletonWrapper isLoading={bankListQuery.isFetching}>
+        <SkeletonWrapper isLoading={false}>
           {bankListQuery.data?.map((account: Account) => (
             <StatCard
               key={account.id}

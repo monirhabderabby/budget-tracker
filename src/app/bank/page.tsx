@@ -1,7 +1,10 @@
 import prisma from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
-import BankStats from "./_components/bank-stats";
+const BankStats = dynamic(() => import("./_components/bank-stats"), {
+  ssr: false,
+});
 
 const Page = async () => {
   const user = await currentUser();
@@ -15,6 +18,7 @@ const Page = async () => {
       userId: user.id,
     },
   });
+
   return (
     <div className="container  py-6">
       <h2 className="text-3xl font-bold">Bank Balance</h2>
