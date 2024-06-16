@@ -3,8 +3,10 @@ import prisma from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
-const History = dynamic(() => import("./_components/history"));
-const OverView = dynamic(() => import("./_components/overview"));
+const History = dynamic(() => import("./_components/history"), { ssr: false });
+const OverView = dynamic(() => import("./_components/overview"), {
+  ssr: false,
+});
 const CreateTransactionDialog = dynamic(
   () => import("./_components/create-transaction-dialog")
 );

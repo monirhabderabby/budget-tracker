@@ -29,7 +29,7 @@ interface Props {
   defaultSelect?: string;
 }
 
-const BankPicker: React.FC<Props> = ({ type, onChange, defaultSelect }) => {
+const BankPicker: React.FC<Props> = ({ onChange, defaultSelect }) => {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(defaultSelect || "");
