@@ -130,7 +130,7 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
                     />
                   </FormControl>
                   <FormDescription>
-                    This is will be your account name
+                    Please note: You cannot change the bank name later.
                   </FormDescription>
                 </FormItem>
               )}
