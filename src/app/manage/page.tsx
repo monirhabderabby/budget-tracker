@@ -17,6 +17,7 @@ import { Account, Category } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   Landmark,
+  Pencil,
   PlusSquare,
   TrashIcon,
   TrendingDown,
@@ -74,36 +75,39 @@ function BankLists() {
         <CardTitle>Bank</CardTitle>
         <CardDescription>Manage your bank accounts</CardDescription>
       </CardHeader>
-      <SkeletonWrapper isLoading={bankListQuery.isFetching}>
-        <CardContent className="grid gap-2 grid-cols-4 lg:grid-cols-6">
-          <CreateBankDialog
-            successCallback={() => {}}
-            trigger={
-              <Card className="border-dotted min-h-[140px] w-full flex flex-col justify-center items-center cursor-pointer group hover:border-[2px]">
-                <Landmark className="stroke h-8 w-8 stroke-amber-500 stroke-[1.5]" />
-                <span className="text-muted-foreground text-center  ">
-                  Add a new <br /> Bank
-                </span>
-              </Card>
-            }
-          />
-          {!dataAvailable && (
-            <div className="flex h-40 w-full flex-col items-center justify-center">
-              <p>
-                No <span className={cn("m-1")}>Bank</span>
-                found yet
-              </p>
-              <p className="text-sm text-muted-foreground ">
-                Add one to get started
-              </p>
-            </div>
-          )}
-          {dataAvailable &&
-            bankListQuery?.data?.map((account: Account) => (
-              <AccountCard account={account} key={account.id} />
-            ))}
-        </CardContent>
-      </SkeletonWrapper>
+      <CardContent className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+        <CreateBankDialog
+          successCallback={() => {}}
+          trigger={
+            <Card className="border-dotted border-[2px] min-h-[140px] w-full flex flex-col justify-center items-center cursor-pointer group hover:border-[2px] shadow-sm shadow-black/[0.1] dark:shadow-white/[0.1]">
+              <Landmark className="stroke h-8 w-8 stroke-amber-500 stroke-[1.5]" />
+              <span className="text-muted-foreground text-center  ">
+                Add a new <br /> Bank
+              </span>
+            </Card>
+          }
+        />
+        {!dataAvailable && bankListQuery.isFetched && (
+          <div className="flex h-40 w-full flex-col items-center justify-center">
+            <p>
+              No <span className={cn("m-1")}>Bank</span>
+              found yet
+            </p>
+            <p className="text-sm text-muted-foreground ">
+              Add one to get started
+            </p>
+          </div>
+        )}
+        {dataAvailable &&
+          bankListQuery?.data?.map((account: Account) => (
+            <SkeletonWrapper
+              key={account.id}
+              isLoading={bankListQuery.isFetching}
+            >
+              <AccountCard account={account} />
+            </SkeletonWrapper>
+          ))}
+      </CardContent>
     </Card>
   );
 }
@@ -172,7 +176,7 @@ function CategoryList({ type }: { type: TransactionType }) {
           </div>
         )}
         {dataAvailable && (
-          <div className="grid grid-flow-row gap-2 p-2 sm:grid-flow-row sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-flow-row gap-2 p-2 sm:grid-flow-row grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {categoriesQuery?.data?.map((category: Category) => (
               <CategoryCard category={category} key={category.id} />
             ))}
@@ -186,6 +190,11 @@ function CategoryList({ type }: { type: TransactionType }) {
 function CategoryCard({ category }: { category: Category }) {
   return (
     <div className="flex border-separate flex-col justify-between rounded-md border shadow-sm shadow-black/[0.1] dark:shadow-white/[0.1]">
+      <div className="flex justify-end p-2">
+        <Button variant="outline" size="icon">
+          <Pencil className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </div>
       <div className="flex flex-col items-center gap-2 p-4">
         <span className="text-3xl " role="img">
           {category.icon}
@@ -217,18 +226,6 @@ function AccountCard({ account }: { account: Account }) {
         </span>
         <span>{account.accountName}</span>
       </div>
-      {/* <DeleteCategoryDialog
-        
-        trigger={
-          <Button
-            className="flex w-full border-separate items-center gap-2 rounded-t-none text-muted-foreground hover:bg-red-500/20"
-            variant="secondary"
-          >
-            <TrashIcon className="w-4 h-4" />
-            Remove
-          </Button>
-        }
-      /> */}
     </div>
   );
 }
