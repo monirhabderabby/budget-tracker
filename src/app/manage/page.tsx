@@ -27,6 +27,7 @@ import Image from "next/image";
 import CreateCategoryDialog from "../dashboard/_components/create-category-dialog";
 import DeleteCategoryDialog from "../dashboard/_components/delete-category-dialog";
 import CreateBankDialog from "./_components/create-bank-dialog";
+import EditCategoryDialog from "./_components/edit-category-dialog";
 
 const Page = () => {
   return (
@@ -191,9 +192,17 @@ function CategoryCard({ category }: { category: Category }) {
   return (
     <div className="flex border-separate flex-col justify-between rounded-md border shadow-sm shadow-black/[0.1] dark:shadow-white/[0.1]">
       <div className="flex justify-end p-2">
-        <Button variant="outline" size="icon">
-          <Pencil className="h-4 w-4 text-muted-foreground" />
-        </Button>
+        <EditCategoryDialog
+          trigger={
+            <Button variant="outline" size="icon">
+              <Pencil className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          }
+          type={category.type as TransactionType}
+          categoryId={category.id}
+          successCallback={() => {}}
+          initialData={category}
+        />
       </div>
       <div className="flex flex-col items-center gap-2 p-4">
         <span className="text-3xl " role="img">
