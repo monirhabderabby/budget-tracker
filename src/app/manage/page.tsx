@@ -231,7 +231,13 @@ function AccountCard({ account }: { account: Account }) {
     <div className="flex border-separate flex-col justify-between rounded-md border shadow-sm shadow-black/[0.1] dark:shadow-white/[0.1]">
       <div className="flex flex-col items-center gap-2 p-4">
         <span className="text-3xl relative" role="img">
-          <Image src={account.accountLogo} width={80} height={80} alt="logo" />
+          <Image
+            src={account.accountLogo}
+            width={40}
+            height={40}
+            className="aspect-square"
+            alt="logo"
+          />
         </span>
         <span>{account.accountName}</span>
       </div>
