@@ -69,7 +69,13 @@ function StatCard({
 
   return (
     <Card className="flex h-24 w-full items-center gap-2 p-4">
-      <Image height={48} width={48} src={logo} alt={name} />
+      <Image
+        height={38}
+        width={38}
+        src={logo}
+        alt={name}
+        className="aspect-square"
+      />
       <div className="flex flex-col items-start gap-0">
         <p className="text-muted-foreground">{name}</p>
         <CountUp
