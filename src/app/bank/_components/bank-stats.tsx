@@ -31,8 +31,11 @@ const BankStats = ({ userSettings }: Props) => {
   return (
     <div>
       <div className=" relative flex w-full flex-wrap gap-3 md:flex-nowrap py-6">
-        <SkeletonWrapper isLoading={false}>
-          {bankListQuery.data?.map((account: Account) => (
+        {bankListQuery.data?.map((account: Account) => (
+          <SkeletonWrapper
+            key={account.id}
+            isLoading={bankListQuery.isFetching}
+          >
             <StatCard
               key={account.id}
               name={account.accountName}
@@ -40,8 +43,8 @@ const BankStats = ({ userSettings }: Props) => {
               amount={account.amount}
               formatter={formatter}
             />
-          ))}
-        </SkeletonWrapper>
+          </SkeletonWrapper>
+        ))}
       </div>
     </div>
   );

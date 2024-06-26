@@ -6,3 +6,11 @@ export const CreateBankSchema = z.object({
 });
 
 export type CreateBankSchemaType = z.infer<typeof CreateBankSchema>;
+
+export const MoneyTransferSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  amount: z.number(),
+});
+
+export type MoneyTransferSchemaType = z.infer<typeof MoneyTransferSchema>;
