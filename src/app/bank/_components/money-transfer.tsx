@@ -85,7 +85,7 @@ const MoneyTransfer = () => {
     <div className="py-6">
       <SkeletonWrapper isLoading={bankListQuery.isLoading}>
         <Card className="w-full">
-          <CardContent className="p-6 w-full flex items-center gap-6 justify-start">
+          <CardContent className="p-6 w-full flex flex-col md:flex-row items-center gap-6 justify-start">
             <AccountSelector
               banks={bankListQuery.data || []}
               value={form.watch("from")}
@@ -112,6 +112,7 @@ const MoneyTransfer = () => {
               onClick={form.handleSubmit(onSubmit)}
               type="submit"
               disabled={isLoading}
+              className="w-full md:w-auto"
             >
               <span className="flex items-center gap-x-3">
                 {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
