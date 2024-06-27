@@ -22,7 +22,43 @@ const handleauth = async () => {
 export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
   logo: f({
-    "image/svg+xml": {
+    ["image/svg+xml"]: {
+      maxFileSize: "1MB",
+      maxFileCount: 1,
+      additionalProperties: { height: 50, width: 50, aspectRatio: 1 },
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(() => handleauth())
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      //   console.log("Upload complete for userId:", metadata.userId);
+
+      //   console.log("file url", file.url);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { urls: file.url };
+    }),
+  logoPNG: f({
+    "image/png": {
+      maxFileSize: "1MB",
+      maxFileCount: 1,
+      additionalProperties: { height: 50, width: 50, aspectRatio: 1 },
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(() => handleauth())
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      //   console.log("Upload complete for userId:", metadata.userId);
+
+      //   console.log("file url", file.url);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { urls: file.url };
+    }),
+  logoWEBP: f({
+    "image/webp": {
       maxFileSize: "1MB",
       maxFileCount: 1,
       additionalProperties: { height: 50, width: 50, aspectRatio: 1 },

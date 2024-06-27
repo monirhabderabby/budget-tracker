@@ -156,8 +156,11 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
                   ) : (
                     <FormControl>
                       <FileUpload
-                        endpoint="logo"
-                        onChange={(urls) => field.onChange(urls[0].url)}
+                        endpoint="logoWEBP"
+                        onChange={(urls) => {
+                          field.onChange(urls[0].url);
+                          console.log("IMAGE URL", urls[0].url);
+                        }}
                       />
                     </FormControl>
                   )}
