@@ -1,4 +1,4 @@
-# Budget Tracker Project Readme
+# Budget Tracker Project
 
 ## Overview
 Welcome to **Budget Tracker**, an intuitive and robust financial management platform. This project is a solo effort designed to enhance my skills in building practical financial solutions. Join us as we embark on a journey to streamline personal finance and empower users with effective money management tools.
