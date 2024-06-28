@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Budget Tracker Project Readme
 
-## Getting Started
+## Overview
+Welcome to **Budget Tracker**, an intuitive and robust financial management platform. This project is a solo effort designed to enhance my skills in building practical financial solutions. Join us as we embark on a journey to streamline personal finance and empower users with effective money management tools.
 
-First, run the development server:
+## Technologies Used
+- **Next.js**: A React framework that enables server-side rendering and provides a powerful development experience.
+- **Tailwind CSS**: A utility-first CSS framework used for designing a responsive and clean user interface.
+- **Prisma**: A modern database toolkit that simplifies database access with a type-safe query builder.
+- **MongoDB**: A NoSQL database used for storing and managing data efficiently.
+- **Stripe**: An online payment processing platform used for secure and smooth transactions.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Expense and Income Tracking
+- **Track Transactions**: Easily track all your expenses and income in one place. Keep a detailed record of every transaction to maintain a clear overview of your financial health.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Category-based Income and Expense Tracking
+- **Categorize Transactions**: Track income and expenses by category to understand where your money is coming from and where it's going. Use this feature to optimize your budgeting and spending habits.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Historical Data Analysis
+- **Analyze Data**: Analyze past financial data to gain insights into spending and saving patterns. Utilize this information to make informed financial decisions and improve budgeting strategies.
 
-## Learn More
+### Bank Account Integration
+- **Manage Accounts**: Add multiple bank accounts to your Budget Tracker. Seamlessly manage and monitor transactions across all your accounts from a single platform.
 
-To learn more about Next.js, take a look at the following resources:
+### Transaction Data Table
+- **View Transactions**: View a comprehensive data table of all your transactions. Easily search, sort, and filter transactions to find specific entries and manage your finances efficiently.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Edit Transactions
+- **Update Records**: Edit transaction details as needed. Ensure accuracy in your financial records by updating incorrect or incomplete information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Conclusion
+Budget Tracker is not just a financial tool; it's a complete solution designed to elevate your financial management experience, making it easier and more efficient to take control of your personal finances.
 
-## Deploy on Vercel
+Thank you for using Budget Tracker! If you have any questions or encounter issues, feel free to reach out. Happy budgeting!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
