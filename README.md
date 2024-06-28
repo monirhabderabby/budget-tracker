@@ -37,4 +37,3 @@ Budget Tracker is not just a financial tool; it's a complete solution designed t
 
 Thank you for using Budget Tracker! If you have any questions or encounter issues, feel free to reach out. Happy budgeting!
 
----
