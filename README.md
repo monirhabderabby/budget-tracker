@@ -8,7 +8,9 @@ Welcome to **Budget Tracker**, an intuitive and robust financial management plat
 - **Tailwind CSS**: A utility-first CSS framework used for designing a responsive and clean user interface.
 - **Prisma**: A modern database toolkit that simplifies database access with a type-safe query builder.
 - **MongoDB**: A NoSQL database used for storing and managing data efficiently.
-- **Stripe**: An online payment processing platform used for secure and smooth transactions.
+- **Shadcn**: A component library used for building reusable UI components.
+- **Recharts**: An online payment processing platform used for secure and smooth transactions.
+
 
 ## Features
 
