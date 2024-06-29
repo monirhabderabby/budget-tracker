@@ -110,10 +110,6 @@ function MobileNavbar() {
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <UserButton afterSignOutUrl="/" />
-                <p className="text-muted-foreground text-xl">{`${user?.firstName} ${user?.lastName}`}</p>
-              </div>
             </section>
           </SheetContent>
         </Sheet>
@@ -122,6 +118,7 @@ function MobileNavbar() {
         </div>
         <div className="flex items-center gap-2">
           <ThemeSwitcher />
+          <UserButton afterSignOutUrl="/" />
         </div>
       </nav>
     </div>
