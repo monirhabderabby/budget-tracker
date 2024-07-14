@@ -1,5 +1,6 @@
 import prisma from "@/lib/db";
 import { GetFormatterForCurrency } from "@/lib/helpers";
+import { redis } from "@/lib/redis";
 import { overviewQuerySchema } from "@/schema/overview";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -23,11 +24,20 @@ export async function GET(req: Request) {
     });
   }
 
+  const cache = await redis.get(`id_${user.id}_transactions`);
+
+  if (cache) {
+    return Response.json(JSON.parse(cache));
+  }
   const transactions = await getTransactionsHistory(
     user.id,
     queryParams.data.from,
     queryParams.data.to
   );
+
+  await redis.set(`id_${user.id}_transactions`, JSON.stringify(transactions));
+
+  await redis.expire(`id_${user.id}_transactions`, 7200);
 
   return Response.json(transactions);
 }
