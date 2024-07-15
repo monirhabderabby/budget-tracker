@@ -101,6 +101,7 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
       setOpen((prev) => !prev);
     },
     onError: (error) => {
+      console.log(error);
       toast.error(error.message, {
         id: "create-transaction",
       });
