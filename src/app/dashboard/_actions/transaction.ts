@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { redis } from "@/lib/redis";
 import {
   CreateTransactionSchema,
   CreateTransactionSchemaType,
@@ -134,6 +135,8 @@ export async function CreateTransaction(form: CreateTransactionSchemaType) {
         },
       });
     }
+    // update cache
+    await redis.del(`id_${user.id}_transactions`);
 
     return result;
   } catch (error) {
@@ -470,6 +473,9 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
           },
         },
       });
+
+      // update cache
+      await redis.del(`id_${user.id}_transactions`);
 
       // remove amount on the current account
       await prisma.account.update({

@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { redis } from "@/lib/redis";
 import { TransactionType } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -23,7 +24,6 @@ export async function DeleteTransaction(id: string) {
   }
 
   // update account
-
   await prisma.$transaction([
     // Delete transaction from db
     prisma.transaction.delete({
@@ -78,6 +78,9 @@ export async function DeleteTransaction(id: string) {
       },
     }),
   ]);
+
+  // update cache
+  await redis.del(`id_${user.id}_transactions`);
 
   switch (transaction.type as TransactionType) {
     case "income":
