@@ -1,8 +1,8 @@
-import prisma from "@/lib/db";
-import { GetFormatterForCurrency } from "@/lib/helpers";
-import { redis } from "@/lib/redis";
-import { overviewQuerySchema } from "@/schema/overview";
-import { currentUser } from "@clerk/nextjs/server";
+import prisma from "@/lib/db"; // Import the Prisma instance to interact with the database
+import { GetFormatterForCurrency, getVanilaDateFormat } from "@/lib/helpers";
+import { redis } from "@/lib/redis"; // Import the Redis instance for caching
+import { overviewQuerySchema } from "@/schema/overview"; // Import the schema for validating query parameters
+import { currentUser } from "@clerk/nextjs/server"; // Import function to get the current user from Clerk
 import { redirect } from "next/navigation";
 
 export async function GET(req: Request) {
@@ -16,29 +16,52 @@ export async function GET(req: Request) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
+  // Import function to get the current user from Clerk
   const queryParams = overviewQuerySchema.safeParse({ from, to });
 
+  // If validation fails, return a 400 error with the error message
   if (!queryParams.success) {
     return Response.json(queryParams.error.message, {
       status: 400,
     });
   }
 
-  const cache = await redis.get(`id_${user.id}_transactions`);
+  // Identify the date is found on the filtered table
+  const dateTable = {
+    from: getVanilaDateFormat(from),
+    to: getVanilaDateFormat(to),
+  };
 
-  if (cache) {
+  // Generate cache keys based on user ID and date range
+  const cachedDateKey = `date:userId=${user.id}&from=${getVanilaDateFormat(
+    from
+  )}&to=${getVanilaDateFormat(to)}`;
+  const key = `transactions:userId=${user.id}`;
+
+  const dateCached = await redis.get(cachedDateKey); // Check if the date range is cached
+  const cache = await redis.get(key); // Check if the transactions are cached
+
+  // If both the date range and transactions are cached, return the cached transactions data
+  if (dateCached && cache) {
     return Response.json(JSON.parse(cache));
   }
+
+  // Fetch the transaction history from the database
   const transactions = await getTransactionsHistory(
     user.id,
     queryParams.data.from,
     queryParams.data.to
   );
 
-  await redis.set(`id_${user.id}_transactions`, JSON.stringify(transactions));
+  // Cache the date range and transactions in Redis
+  await redis.set(cachedDateKey, JSON.stringify(dateTable));
+  await redis.set(key, JSON.stringify(transactions));
 
-  await redis.expire(`id_${user.id}_transactions`, 7200);
+  // Set expiration time for the cache keys (1 hour)
+  await redis.expire(cachedDateKey, 3600);
+  await redis.expire(key, 3600);
 
+  // Return the transactions as the response
   return Response.json(transactions);
 }
 
@@ -57,13 +80,16 @@ async function getTransactionsHistory(userId: string, from: Date, to: Date) {
     throw new Error("user settings not found!");
   }
 
+  // Get the currency formatter based on user settings
   const formatter = GetFormatterForCurrency(userSettings.currency);
 
+  // Calculate the previous day for the query range
   const dateObj = new Date(from);
   const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
   const previousDay = new Date(dateObj.getTime() - oneDayInMilliseconds);
   const previousDayStr = previousDay.toISOString();
 
+  // Fetch the transactions from the database
   const transactions = await prisma.transaction.findMany({
     where: {
       userId,
@@ -80,6 +106,7 @@ async function getTransactionsHistory(userId: string, from: Date, to: Date) {
     },
   });
 
+  // Return the transactions with formatted amounts
   return transactions.map((transaction) => ({
     ...transaction,
     // let's format the amount with the user currency
