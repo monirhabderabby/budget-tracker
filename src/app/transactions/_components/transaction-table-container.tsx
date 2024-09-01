@@ -1,7 +1,7 @@
 "use client";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { MAX_DATE_RANGE_DAYS } from "@/lib/constants";
-import { differenceInDays, startOfMonth } from "date-fns";
+import { differenceInDays, lastDayOfMonth, startOfMonth } from "date-fns";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ const TransactionTable = dynamic(() => import("./transaction-table"));
 const TransactionTableContainer = () => {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
-    to: new Date(),
+    to: lastDayOfMonth(new Date()),
   });
 
   return (
