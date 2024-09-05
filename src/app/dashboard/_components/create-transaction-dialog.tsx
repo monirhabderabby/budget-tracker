@@ -11,22 +11,8 @@ import {
 } from "@/components/ui/motion-dialog";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import CustomField from "@/components/ui/CustomField";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Form } from "@/components/ui/form";
 import { DateToUTCDate } from "@/lib/helpers";
 import { TransactionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -36,8 +22,7 @@ import {
 } from "@/schema/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -53,7 +38,7 @@ const BankPicker = dynamic(() => import("./bank-picker"), {
 export enum FieldType {
   INPUT = "input",
   SKELETON = "skeleton",
-  DATE = "date",
+  DATE_PICKER = "date",
 }
 
 interface Props {
@@ -62,6 +47,7 @@ interface Props {
 }
 const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
   const [isOpen, setIsOpen] = useState(false);
+
   const form = useForm<CreateTransactionSchemaType>({
     resolver: zodResolver(CreateTransactionSchema),
     defaultValues: {
@@ -203,67 +189,21 @@ const CreateTransactionDialog: React.FC<Props> = ({ trigger, type }) => {
                     </div>
 
                     <div className="flex items-center justify-between gap-2 w-full">
-                      <FormField
+                      <CustomField
                         control={form.control}
                         name="date"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col flex-1">
-                            <FormLabel>Transaction Data</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    className={cn(
-                                      "w-full pl-3 text-left font-normal",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                    variant="outline"
-                                  >
-                                    {field.value ? (
-                                      format(field.value, "PPP")
-                                    ) : (
-                                      <span>Pick a date</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-full">
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={(value) => {
-                                    if (!value) return;
-                                    field.onChange(value);
-                                  }}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-
-                            <FormDescription>
-                              Select a date for this
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        fieldType={FieldType.DATE_PICKER}
+                        label="Transaction Date"
+                        description="Select a date for this"
                       />
-                      <FormField
+                      <CustomField
                         control={form.control}
                         name="accountId"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col flex-1">
-                            <FormLabel>Account</FormLabel>
-                            <FormControl>
-                              <BankPicker
-                                type={type}
-                                onChange={handleBankChange}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              Bank for this transaction
-                            </FormDescription>
-                          </FormItem>
+                        fieldType={FieldType.SKELETON}
+                        label="Account"
+                        description="Bank for this transaction"
+                        renderSkeleton={(field) => (
+                          <BankPicker type={type} onChange={handleBankChange} />
                         )}
                       />
                     </div>
