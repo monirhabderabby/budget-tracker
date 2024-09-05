@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DialogTitle } from "@/components/ui/motion-dialog";
 import prisma from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import dynamic from "next/dynamic";
@@ -36,7 +37,7 @@ const Dashboard = async () => {
                   variant="outline"
                   className="border-emerald-500 bg-emerald-950 text-white hover:bg-emerald-700 hover:text-white"
                 >
-                  New income 🤑
+                  <DialogTitle>New income 🤑</DialogTitle>
                 </Button>
               }
             />

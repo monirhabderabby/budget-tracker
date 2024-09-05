@@ -82,7 +82,10 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange, defaultSelect }) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[220px] p-0">
+      <PopoverContent
+        className="w-[220px] p-0"
+        // onClick={(e) => e.stopPropagation()} // Stop propagation to prevent dialog closing
+      >
         <Command
           onSubmit={(e) => {
             e.preventDefault();
@@ -102,7 +105,7 @@ const CategoryPicker: React.FC<Props> = ({ type, onChange, defaultSelect }) => {
                 categoriesQuery.data.map((category: Category) => (
                   <CommandItem
                     key={category.id}
-                    onSelect={(currentvalue) => {
+                    onSelect={(e: any) => {
                       setValue(category.name);
                       setOpen((prev) => !prev);
                     }}
