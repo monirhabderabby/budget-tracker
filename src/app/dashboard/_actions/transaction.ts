@@ -135,8 +135,9 @@ export async function CreateTransaction(form: CreateTransactionSchemaType) {
         },
       });
     }
+    const cachedKey = `transactions:userId=${user.id}`;
     // update cache
-    await redis.del(`id_${user.id}_transactions`);
+    await redis.del(cachedKey);
 
     return result;
   } catch (error) {

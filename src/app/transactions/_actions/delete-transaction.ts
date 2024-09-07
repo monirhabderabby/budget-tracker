@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { redis } from "@/lib/redis";
 import { TransactionType } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
+import { Transaction } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 export async function DeleteTransaction(id: string) {
@@ -80,7 +81,18 @@ export async function DeleteTransaction(id: string) {
   ]);
 
   // update cache
-  await redis.del(`id_${user.id}_transactions`);
+  // all transaction of user
+  const cachedKey = `transactions:userId=${user.id}`;
+  const cachedData = await redis.get(cachedKey);
+  const cachedTransactions = cachedData ? JSON.parse(cachedData) : null;
+
+  // update cache
+  if (cachedTransactions) {
+    const updatedTransactions = cachedTransactions.filter(
+      (data: Transaction) => data.id !== id
+    );
+    await redis.set(cachedKey, JSON.stringify(updatedTransactions));
+  }
 
   switch (transaction.type as TransactionType) {
     case "income":
@@ -235,6 +247,18 @@ export async function bulkDelete(ids: string[]) {
     ...yearHistoryOperations,
     ...accountOperations,
   ]);
+
+  const cachedKey = `transactions:userId=${user.id}`;
+  const cachedData = await redis.get(cachedKey);
+  const cachedTransactions = cachedData ? JSON.parse(cachedData) : null;
+
+  // update cache
+  if (cachedTransactions) {
+    const updatedTransactions = cachedTransactions.filter(
+      (item: Transaction) => !ids.includes(item.id)
+    );
+    await redis.set(cachedKey, JSON.stringify(updatedTransactions));
+  }
 
   return result;
 }
