@@ -1,6 +1,11 @@
 import prisma from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
+
+export const config = {
+  runtime: "edge",
+};
 
 export async function GET(req: Request, res: Response) {
   const user = await currentUser();
@@ -16,7 +21,11 @@ export async function GET(req: Request, res: Response) {
     orderBy: {
       createdAt: "desc",
     },
+    cacheStrategy: {
+      ttl: 60,
+      swr: 40,
+    },
   });
 
-  return Response.json(result);
+  return NextResponse.json(result);
 }

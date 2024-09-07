@@ -4,6 +4,7 @@ import { redis } from "@/lib/redis"; // Import the Redis instance for caching
 import { overviewQuerySchema } from "@/schema/overview"; // Import the schema for validating query parameters
 import { currentUser } from "@clerk/nextjs/server"; // Import function to get the current user from Clerk
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const user = await currentUser();
@@ -58,11 +59,11 @@ export async function GET(req: Request) {
   await redis.set(key, JSON.stringify(transactions));
 
   // Set expiration time for the cache keys (1 hour)
-  await redis.expire(cachedDateKey, 3600);
-  await redis.expire(key, 3600);
+  await redis.expire(cachedDateKey, 60);
+  await redis.expire(key, 60);
 
   // Return the transactions as the response
-  return Response.json(transactions);
+  return NextResponse.json(transactions);
 }
 
 export type GetTransactionsHistoryType = Awaited<
