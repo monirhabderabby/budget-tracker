@@ -1,5 +1,7 @@
 "use server";
 
+import { getTransactionskey } from "@/constants/cache";
+import { updateBalanceCache } from "@/helper/cache/balance";
 import prisma from "@/lib/db";
 import { redis } from "@/lib/redis";
 import {
@@ -135,9 +137,30 @@ export async function CreateTransaction(form: CreateTransactionSchemaType) {
         },
       });
     }
-    const cachedKey = `transactions:userId=${user.id}`;
+
     // update cache
-    await redis.del(cachedKey);
+    const transactionskey = getTransactionskey(user.id);
+    const cachedTransactions = await redis.get(transactionskey);
+
+    await redis.set(
+      transactionskey,
+      JSON.stringify([result[0], ...JSON.parse(cachedTransactions || "[]")])
+    );
+
+    // Update the user's balance cache by calling the updateBalanceCache function.
+    // The function takes an object with the following parameters:
+    // - userId: The ID of the user whose balance needs to be updated.
+    // - amount: The amount by which the balance should be updated (added or subtracted).
+    // - type: The type of transaction, either "income" or "expense".
+    // - action: Specifies the action to perform, in this case, "increment",
+    //   indicating that the balance should be increased by the given amount.
+    // The updateBalanceCache function handles the logic of updating the Redis cache with the new balance.
+    await updateBalanceCache({
+      userId: user.id,
+      amount: amount,
+      type: type,
+      action: "increment",
+    });
 
     return result;
   } catch (error) {
@@ -210,8 +233,6 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
     },
   });
 
-  console.log("@@transactionUpdateResult", transactionUpdateResult);
-
   // Calculate the difference between the previous amount and the new amount
   const differAmount = Math.abs(previousAmount - amount);
   const isWillbeIncrease = amount >= previousAmount;
@@ -264,15 +285,6 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
       decreasePreviousMonthAmount,
       decreasePreviousYearAmount,
     ]);
-
-    console.log(
-      "@@decreasePreviousAMountFromMonthResult",
-      decreasePreviousAMountFromMonthResult
-    );
-    console.log(
-      "@@decreasePreviousAMountFromYearResult",
-      decreasePreviousAMountFromYearResult
-    );
   }
 
   // LOGIC #2 >> SUBLOGIC #2: Increment of Decreament data on the monthsihtory and yearHistory based on the condition
@@ -476,7 +488,6 @@ export async function updateTransaction(form: UpdateTransactionSchemaType) {
       });
 
       // update cache
-      await redis.del(`id_${user.id}_transactions`);
 
       // remove amount on the current account
       await prisma.account.update({

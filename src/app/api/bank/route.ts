@@ -17,10 +17,6 @@ export async function GET(req: Request, res: Response) {
     orderBy: {
       createdAt: "desc",
     },
-    cacheStrategy: {
-      ttl: 60,
-      swr: 40,
-    },
   });
 
   return NextResponse.json(result);

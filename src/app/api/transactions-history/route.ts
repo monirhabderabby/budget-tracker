@@ -1,3 +1,7 @@
+import {
+  getDateRangekeyForTransactions,
+  getTransactionskey,
+} from "@/constants/cache";
 import prisma from "@/lib/db"; // Import the Prisma instance to interact with the database
 import { GetFormatterForCurrency, getVanilaDateFormat } from "@/lib/helpers";
 import { redis } from "@/lib/redis"; // Import the Redis instance for caching
@@ -34,13 +38,15 @@ export async function GET(req: Request) {
   };
 
   // Generate cache keys based on user ID and date range
-  const cachedDateKey = `date:userId=${user.id}&from=${getVanilaDateFormat(
-    from
-  )}&to=${getVanilaDateFormat(to)}`;
-  const key = `transactions:userId=${user.id}`;
+  const cachedDateRangeKey = getDateRangekeyForTransactions(
+    user.id,
+    from!,
+    to!
+  );
+  const transactionsKey = getTransactionskey(user.id);
 
-  const dateCached = await redis.get(cachedDateKey); // Check if the date range is cached
-  const cache = await redis.get(key); // Check if the transactions are cached
+  const dateCached = await redis.get(cachedDateRangeKey); // Check if the date range is cached
+  const cache = await redis.get(transactionsKey); // Check if the transactions are cached
 
   // If both the date range and transactions are cached, return the cached transactions data
   if (dateCached && cache) {
@@ -55,12 +61,12 @@ export async function GET(req: Request) {
   );
 
   // Cache the date range and transactions in Redis
-  await redis.set(cachedDateKey, JSON.stringify(dateTable));
-  await redis.set(key, JSON.stringify(transactions));
+  await redis.set(cachedDateRangeKey, JSON.stringify(dateTable));
+  await redis.set(transactionsKey, JSON.stringify(transactions));
 
   // Set expiration time for the cache keys (1 hour)
-  await redis.expire(cachedDateKey, 60);
-  await redis.expire(key, 60);
+  await redis.expire(cachedDateRangeKey, 60);
+  await redis.expire(transactionsKey, 60);
 
   // Return the transactions as the response
   return NextResponse.json(transactions);
