@@ -1,3 +1,4 @@
+import { getStatsBalanceKey, getStatsRangeKey } from "@/constants/cache";
 import prisma from "@/lib/db";
 import { getVanilaDateFormat } from "@/lib/helpers";
 import { redis } from "@/lib/redis";
@@ -24,10 +25,8 @@ export async function GET(req: Request, res: Response) {
   };
 
   // stats key
-  const statsRangeKey = `statsDate:userId=${user.id}&from=${getVanilaDateFormat(
-    from
-  )}&to=${getVanilaDateFormat(to)}`;
-  const balanceKey = `stats_balance:userId=${user.id}`;
+  const statsRangeKey = getStatsRangeKey(user.id, from!, to!);
+  const balanceKey = getStatsBalanceKey(user.id);
 
   const queryParams = overviewQuerySchema.safeParse({ from, to });
 
@@ -55,8 +54,8 @@ export async function GET(req: Request, res: Response) {
   await redis.set(balanceKey, JSON.stringify(stats));
 
   // Set expiration time for the cache keys (1 hour)
-  await redis.expire(statsRangeKey, 3600);
-  await redis.expire(balanceKey, 3600);
+  await redis.expire(statsRangeKey, 60);
+  await redis.expire(balanceKey, 60);
 
   return Response.json(stats);
 }

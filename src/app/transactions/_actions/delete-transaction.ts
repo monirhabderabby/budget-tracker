@@ -1,5 +1,7 @@
 "use server";
 
+import { getStatsBalanceKey, getTransactionskey } from "@/constants/cache";
+import { updateBalanceCache } from "@/helper/cache/balance";
 import prisma from "@/lib/db";
 import { redis } from "@/lib/redis";
 import { TransactionType } from "@/lib/types";
@@ -82,15 +84,45 @@ export async function DeleteTransaction(id: string) {
 
   // update cache
   // all transaction of user
-  const cachedKey = `transactions:userId=${user.id}`;
+  const cachedKey = getTransactionskey(user.id);
   const cachedData = await redis.get(cachedKey);
   const cachedTransactions = cachedData ? JSON.parse(cachedData) : null;
 
-  // update cache
   if (cachedTransactions) {
-    const updatedTransactions = cachedTransactions.filter(
-      (data: Transaction) => data.id !== id
-    );
+    // Initialize an empty array to store the updated transactions
+    const updatedTransactions = [];
+
+    // Iterate over each transaction in the cachedTransactions array
+    for (const data of cachedTransactions) {
+      // Check if the current transaction matches the transaction that needs to be updated (based on ID)
+      if (data.id === id) {
+        // If the transaction type is "income", decrement the transaction amount from the income balance
+        if (data.type === "income") {
+          await updateBalanceCache({
+            userId: user.id,
+            amount: data.amount,
+            type: "income",
+            action: "decrement",
+          });
+        }
+        // If the transaction type is "expense", decrement the transaction amount from the expense balance
+        else if (data.type === "expense") {
+          await updateBalanceCache({
+            userId: user.id,
+            type: "expense",
+            amount: data.amount,
+            action: "decrement",
+          });
+        }
+      }
+      // If the transaction does not match the ID that needs to be updated, add it to the updatedTransactions array
+      else {
+        updatedTransactions.push(data);
+      }
+    }
+
+    // After processing all transactions, update the transactions cache in Redis
+    // Store the updated transactions array as a JSON string
     await redis.set(cachedKey, JSON.stringify(updatedTransactions));
   }
 
@@ -248,8 +280,11 @@ export async function bulkDelete(ids: string[]) {
     ...accountOperations,
   ]);
 
-  const cachedKey = `transactions:userId=${user.id}`;
-  const cachedData = await redis.get(cachedKey);
+  const statsBalanceKey = getStatsBalanceKey(user.id);
+  await redis.del(statsBalanceKey);
+
+  const cachedTransactionsKey = getTransactionskey(user.id);
+  const cachedData = await redis.get(cachedTransactionsKey);
   const cachedTransactions = cachedData ? JSON.parse(cachedData) : null;
 
   // update cache
@@ -257,7 +292,7 @@ export async function bulkDelete(ids: string[]) {
     const updatedTransactions = cachedTransactions.filter(
       (item: Transaction) => !ids.includes(item.id)
     );
-    await redis.set(cachedKey, JSON.stringify(updatedTransactions));
+    await redis.set(cachedTransactionsKey, JSON.stringify(updatedTransactions));
   }
 
   return result;
