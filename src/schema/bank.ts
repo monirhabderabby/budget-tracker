@@ -14,3 +14,14 @@ export const MoneyTransferSchema = z.object({
 });
 
 export type MoneyTransferSchemaType = z.infer<typeof MoneyTransferSchema>;
+
+export const BankSelectionFormSchema = z.object({
+  banks: z
+    .array(z.string().min(1))
+    .min(1)
+    .nonempty("Please select at least one bank"),
+});
+
+export type BankSelectionFormSchemaType = z.infer<
+  typeof BankSelectionFormSchema
+>;
