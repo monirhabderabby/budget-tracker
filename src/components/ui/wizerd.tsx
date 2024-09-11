@@ -2,7 +2,7 @@
 
 // Packages
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -34,6 +34,7 @@ const Wizerd = () => {
 
   const router = useRouter();
   const confetti = useConfettiStore();
+  const queryClient = useQueryClient();
 
   // Mutation to update wizard settings, handles success and error cases
   const { mutate, isPending } = useMutation({
@@ -46,8 +47,10 @@ const Wizerd = () => {
 
       // Show success toast and redirect to dashboard on successful mutation
       toast.success("Your account is all set up and ready to go. 🎉");
-      confetti.onOpen(); // Trigger confetti animation
+
       router.push("/dashboard");
+      confetti.onOpen(); // Trigger confetti animation
+      queryClient.invalidateQueries({ queryKey: ["user-currency"] });
     },
     onError: (error: any) => {
       toast.error(error.message); // Show error toast if mutation fails
