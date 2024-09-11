@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import CurrencyComboBox from "@/components/ui/currency-combobox";
 import { Separator } from "@/components/ui/separator";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { TransactionType } from "@/lib/types";
@@ -27,6 +26,7 @@ import Image from "next/image";
 import CreateCategoryDialog from "../dashboard/_components/create-category-dialog";
 import DeleteCategoryDialog from "../dashboard/_components/delete-category-dialog";
 import CreateBankDialog from "./_components/create-bank-dialog";
+import CurrencyChanger from "./_components/currency-changer";
 import EditCategoryDialog from "./_components/edit-category-dialog";
 
 const Page = () => {
@@ -43,17 +43,7 @@ const Page = () => {
       {/* END HEADER */}
       <div className="container flex flex-col gap-4 p-4">
         <BankLists />
-        <Card>
-          <CardHeader>
-            <CardTitle>Currency</CardTitle>
-            <CardDescription>
-              Set your default currency for transactions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CurrencyComboBox onValueChange={() => {}} />
-          </CardContent>
-        </Card>
+        <CurrencyChanger />
         <CategoryList type="income" />
         <CategoryList type="expense" />
       </div>

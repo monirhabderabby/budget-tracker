@@ -11,3 +11,7 @@ export const UpdateUserCurrencySchema = z.object({
     return value;
   }),
 });
+
+export type UpdateUserCurrencySchemaType = z.infer<
+  typeof UpdateUserCurrencySchema
+>;
