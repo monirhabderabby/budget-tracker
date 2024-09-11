@@ -51,7 +51,7 @@ const Page = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CurrencyComboBox />
+            <CurrencyComboBox onValueChange={() => {}} />
           </CardContent>
         </Card>
         <CategoryList type="income" />

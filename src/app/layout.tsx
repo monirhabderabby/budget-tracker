@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar/navbar";
+import { ConfettiProvider } from "@/components/provider/confetti-provider";
 import RootProvider from "@/components/provider/root-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
@@ -29,6 +30,7 @@ export default async function RootLayout({
       >
         <body className={inter.className}>
           <Toaster richColors position="bottom-right" />
+          <ConfettiProvider />
           <RootProvider>
             <Navbar />
             {children}

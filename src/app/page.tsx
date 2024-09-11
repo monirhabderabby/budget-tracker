@@ -1,13 +1,14 @@
-const BannerImage = dynamic(() => import("@/components/hero/banner-image"));
+// Packages
 import TextSwipe from "@/components/animation/text-swipe";
 import { currentUser } from "@clerk/nextjs/server";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
+// Components
+const BannerImage = dynamic(() => import("@/components/hero/banner-image"));
+
 export default async function Home() {
   const user = await currentUser();
-
-  console.log(user?.id);
 
   return (
     <div>

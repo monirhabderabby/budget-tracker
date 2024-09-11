@@ -1,8 +1,10 @@
 "use client";
 
+// Packages
 import * as React from "react";
+import { toast } from "sonner";
 
-import { UpdateUserCurrency } from "@/app/wizerd/_actions/user-settings";
+// Components
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -18,145 +20,110 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMediaQuery } from "@/hooks/useMediaQuery"; // Hook for detecting screen width (desktop vs mobile)
 import { Currencies, Currency } from "@/lib/currency";
-import { UserSettings } from "@prisma/client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import SkeletonWrapper from "./skeleton-wrapper";
 
-export default function CurrencyComboBox() {
-  const [open, setOpen] = React.useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+// Props interface for the CurrencyComboBox component
+interface CurrencyComboBoxProps {
+  onValueChange: (currency: string) => void;
+  isLoading?: boolean;
+}
+
+export default function CurrencyComboBox({
+  onValueChange,
+  isLoading,
+}: CurrencyComboBoxProps) {
+  const [open, setOpen] = React.useState(false); // State to manage whether the drawer/popover is open
+  const isDesktop = useMediaQuery("(min-width: 768px)"); // Check if the screen size is desktop or mobile
   const [selectedOption, setSelectedOption] = React.useState<Currency | null>(
     null
-  );
+  ); // State to manage the selected currency option
 
-  const userSettings = useQuery<UserSettings>({
-    queryKey: ["userSettings"],
-    queryFn: () => fetch("/api/user-settings").then((res) => res.json()),
-  });
-
-  const queryClient = useQueryClient();
-
-  React.useEffect(() => {
-    if (!userSettings.data) return;
-
-    const userCurrency = Currencies.find(
-      (currency) => currency.value === userSettings.data.currency
-    );
-
-    if (userCurrency) {
-      setSelectedOption(userCurrency);
+  // Function to handle the selection of a currency
+  const selectOption = React.useCallback((currency: Currency | null) => {
+    if (!currency) {
+      toast.error("Please select a currency"); // Show error if no currency is selected
+      return;
     }
-  }, [userSettings.data]);
 
-  const mutation = useMutation({
-    mutationFn: UpdateUserCurrency,
-    onSuccess: (data: UserSettings) => {
-      toast.success("Currency updated successfully 🎉", {
-        id: "update-currency",
-      });
-      setSelectedOption(
-        Currencies.find((c) => c.value === data.currency) || null
-      );
+    setSelectedOption(currency);
+    onValueChange(currency?.value);
+  }, []);
 
-      queryClient.invalidateQueries({
-        queryKey: ["stats", "overview", "history"],
-      });
-    },
-    onError: () => {
-      toast.error("Something went wrong", {
-        id: "update-currency",
-      });
-    },
-  });
-
-  const selectOption = React.useCallback(
-    (currency: Currency | null) => {
-      if (!currency) {
-        toast.error("Please select a currency");
-        return;
-      }
-
-      toast.loading("Updating currency...", {
-        id: "update-currency",
-      });
-
-      mutation.mutate(currency?.value);
-    },
-    [mutation]
-  );
-
+  // Render different UI for desktop and mobile
   if (isDesktop) {
     return (
-      <SkeletonWrapper isLoading={userSettings.isFetching}>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              disabled={mutation.isPending}
-            >
-              {selectedOption ? <>{selectedOption.label}</> : <>Set currency</>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0" align="start">
-            <StatusList setOpen={setOpen} setSelectedOption={selectOption} />
-          </PopoverContent>
-        </Popover>
-      </SkeletonWrapper>
-    );
-  }
-
-  return (
-    <SkeletonWrapper isLoading={userSettings.isFetching}>
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>
+      // Use Popover for desktop
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             variant="outline"
             className="w-full justify-start"
-            disabled={mutation.isPending}
+            disabled={isLoading}
           >
+            {/* Show selected currency label or default text */}
             {selectedOption ? <>{selectedOption.label}</> : <>Set currency</>}
           </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <div className="mt-4 border-t">
-            <StatusList setOpen={setOpen} setSelectedOption={selectOption} />
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </SkeletonWrapper>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          <StatusList setOpen={setOpen} setSelectedOption={selectOption} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  // Use Drawer for mobile
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          disabled={isLoading}
+        >
+          {/* Show selected currency label or default text */}
+          {selectedOption ? <>{selectedOption.label}</> : <>Set currency</>}
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <div className="mt-4 border-t">
+          <StatusList setOpen={setOpen} setSelectedOption={selectOption} />
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
+// Component to list available currency options
 function StatusList({
   setOpen,
   setSelectedOption,
 }: {
-  setOpen: (open: boolean) => void;
-  setSelectedOption: (status: Currency | null) => void;
+  setOpen: (open: boolean) => void; // Function to close the drawer/popover
+  setSelectedOption: (status: Currency | null) => void; // Function to handle currency selection
 }) {
   return (
     <Command>
+      {/* Input for filtering currency options */}
       <CommandInput placeholder="Filter status..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup>
+          {/* Render each currency as a selectable item */}
           {Currencies.map((item: Currency) => (
             <CommandItem
               key={item.value}
               value={item.value}
               onSelect={(value) => {
+                // Find the selected currency and update the state
                 setSelectedOption(
                   Currencies.find((priority) => priority.value === value) ||
                     null
                 );
-                setOpen(false);
+                setOpen(false); // Close the drawer/popover
               }}
             >
-              {item.label}
+              {item.label} {/* Display currency label */}
             </CommandItem>
           ))}
         </CommandGroup>
