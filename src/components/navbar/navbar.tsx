@@ -141,8 +141,8 @@ function NavbarItem({
       <Link
         href={link}
         className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "w-full justify-start text-lg text-muted-foreground hover:text-foreground",
+          buttonVariants({ variant: "lineAnim" }),
+          "w-full  justify-start text-lg text-muted-foreground ",
           isActive && "text-foreground"
         )}
         onClick={() => {
