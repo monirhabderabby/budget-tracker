@@ -25,8 +25,10 @@ const BankStats = ({ userSettings }: Props) => {
   });
 
   const formatter = useMemo(() => {
-    return GetFormatterForCurrency(userSettings.currency);
-  }, [userSettings.currency]);
+    if (userSettings?.currency) {
+      return GetFormatterForCurrency(userSettings?.currency);
+    }
+  }, [userSettings?.currency]);
 
   return (
     <div>
@@ -41,7 +43,7 @@ const BankStats = ({ userSettings }: Props) => {
               name={account.accountName}
               logo={account.accountLogo}
               amount={account.amount}
-              formatter={formatter}
+              formatter={formatter!}
             />
           </SkeletonWrapper>
         ))}

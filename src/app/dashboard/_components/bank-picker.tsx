@@ -1,6 +1,5 @@
 "use client";
 
-import CreateBankDialog from "@/app/manage/_components/create-bank-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -21,7 +20,7 @@ import { Account } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   type: TransactionType;
@@ -48,13 +47,6 @@ const BankPicker: React.FC<Props> = ({ onChange, defaultSelect }) => {
     queryFn: () => fetch(`/api/bank`).then((res) => res.json()),
   });
 
-  const successCallbak = useCallback(
-    (account: Account) => {
-      setValue(account.id);
-      setOpen((prev) => !prev);
-    },
-    [setValue, setOpen]
-  );
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -89,7 +81,6 @@ const BankPicker: React.FC<Props> = ({ onChange, defaultSelect }) => {
           }}
         >
           <CommandInput placeholder="Search category..." />
-          <CreateBankDialog successCallback={successCallbak} />
           <CommandEmpty>
             <p>Category not found</p>
             <p className="text-xs text-muted-foreground">
