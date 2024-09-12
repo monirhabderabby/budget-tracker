@@ -48,7 +48,10 @@ const Wizerd = () => {
       // Show success toast and redirect to dashboard on successful mutation
       toast.success("Your account is all set up and ready to go. 🎉");
 
-      router.push("/dashboard");
+      router.push("/dashboard", {
+        scroll: false,
+      });
+
       confetti.onOpen(); // Trigger confetti animation
       queryClient.invalidateQueries({ queryKey: ["user-currency"] });
     },

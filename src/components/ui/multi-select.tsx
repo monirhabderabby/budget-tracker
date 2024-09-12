@@ -122,6 +122,7 @@ function transToGroupOption(options: Option[], groupBy?: string) {
     }
     groupOption[key].push(option);
   });
+  console.log(groupOption);
   return groupOption;
 }
 
