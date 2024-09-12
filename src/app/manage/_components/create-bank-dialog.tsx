@@ -1,5 +1,17 @@
 "use client";
 
+// Packages
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Account } from "@prisma/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, PlusSquare } from "lucide-react";
+import { ReactNode, useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+// Components
+
+import BankSelectionBox from "@/components/ui/bank-selections-box";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,59 +23,52 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import FileUpload from "@/components/ui/file-upload";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { CreateBankSchema, CreateBankSchemaType } from "@/schema/bank";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Account } from "@prisma/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, PlusSquare } from "lucide-react";
-import Image from "next/image";
-import { ReactNode, useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { addBankAccount } from "../_actions/bank";
+import {
+  BankSelectionFormSchema,
+  BankSelectionFormSchemaType,
+} from "@/schema/bank";
+import { updateBankAccount } from "../_actions/bank";
 
 interface Props {
-  successCallback: (account: Account) => void;
+  successCallback: (data: string) => void;
   trigger?: ReactNode;
 }
 
 const CreateBankDialog = ({ successCallback, trigger }: Props) => {
   const [open, setOpen] = useState(false);
-  const form = useForm<CreateBankSchemaType>({
-    resolver: zodResolver(CreateBankSchema),
-    defaultValues: {
-      accountName: "",
-      accountLogo: "",
-    },
+
+  // Initialize form with validation schema
+  const form = useForm<BankSelectionFormSchemaType>({
+    resolver: zodResolver(BankSelectionFormSchema),
+    defaultValues: {},
   });
 
-  const { watch } = form;
+  // Fetch bank data from API
+  const { data, isLoading } = useQuery({
+    queryKey: ["banks"],
+    queryFn: () => fetch("/api/bank").then((res) => res.json()),
+  });
 
   const queryClient = useQueryClient();
 
+  // Mutation for updating bank account
   const { mutate, isPending } = useMutation({
-    mutationFn: addBankAccount,
-    onSuccess: async (data: Account) => {
-      toast.success(`Added ${data.accountName} account successfully 🎉`, {
+    mutationFn: updateBankAccount,
+    onSuccess: async (data) => {
+      // On success, show toast, reset form, and refresh bank data
+      toast.success("Account action successfully.", {
         id: "add-bank",
       });
-
-      form.reset({
-        accountLogo: "",
-        accountName: "",
-      });
-      successCallback(data);
+      form.reset();
+      successCallback("");
 
       await queryClient.invalidateQueries({
         queryKey: ["banks"],
@@ -72,6 +77,7 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
       setOpen((prev) => !prev);
     },
     onError: () => {
+      // On error, show error toast
       toast.error("Something went wrong", {
         id: "add-bank",
       });
@@ -79,12 +85,8 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
   });
 
   const onSubmit = useCallback(
-    (values: CreateBankSchemaType) => {
-      toast.loading("Adding a bank account", {
-        id: "add-bank",
-      });
-
-      // mutate now
+    (values: BankSelectionFormSchemaType) => {
+      // Trigger mutation to update bank account
       mutate(values);
     },
     [mutate]
@@ -111,63 +113,32 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
             Create <span className={cn("m-1 text-emerald-500")}>Bank</span>
             details
           </DialogTitle>
-          <DialogDescription>
-            Categories are used to group your transactions
+          <DialogDescription className="pt-2">
+            💡 Please note: Removing your bank account will permanently lose its
+            balance, but your transaction history will remain
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-5 my-5"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <FormField
               control={form.control}
-              name="accountName"
+              name="banks"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Cash/Bkash/Nagad/Bank Name"
+                    <BankSelectionBox
+                      onValueSelect={(selected) => field.onChange(selected)}
+                      isLoading={isLoading}
+                      defaultValue={data.map((bank: Account) => ({
+                        value: bank.accountLogo,
+                        label: bank.accountName,
+                      }))}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Please note: You cannot change the bank name later.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="accountLogo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo</FormLabel>
-                  {watch("accountLogo") ? (
-                    <div className="relative w-full h-[206px] rounded-md border-dotted border-[1px] border-input flex flex-col justify-center items-center gap-y-3">
-                      <div className="relative h-[66px] w-[66px]  rounded-md">
-                        <Image src={watch("accountLogo")} alt="Logo" fill />
-                      </div>
-                      <Button
-                        variant="link"
-                        onClick={() => form.resetField("accountLogo")}
-                      >
-                        Change Logo
-                      </Button>
-                    </div>
-                  ) : (
-                    <FormControl>
-                      <FileUpload
-                        endpoint="logoWEBP"
-                        onChange={(urls) => {
-                          field.onChange(urls[0].url);
-                          console.log("IMAGE URL", urls[0].url);
-                        }}
-                      />
-                    </FormControl>
-                  )}
-
-                  <FormDescription>
-                    This is will be your bank account logo
-                  </FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -186,9 +157,17 @@ const CreateBankDialog = ({ successCallback, trigger }: Props) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)}>
-            {!isPending && "Create"}
-            {isPending && <Loader2 className="animate-spin" />}
+          <Button
+            disabled={isPending}
+            type="submit"
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            {!isPending && "I'm done"}
+            {isPending && (
+              <div className="flex items-center gap-x-2">
+                <Loader2 className="animate-spin h-4 w-4" /> <span>Wait</span>
+              </div>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

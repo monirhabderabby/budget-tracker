@@ -1,6 +1,5 @@
 "use client";
 
-import CreateBankDialog from "@/app/manage/_components/create-bank-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -82,7 +81,6 @@ const AccountSelector: React.FC<Props> = ({ onChange, banks, value }) => {
           }}
         >
           <CommandInput placeholder="Search category..." />
-          <CreateBankDialog successCallback={successCallbak} />
           <CommandEmpty>
             <p>Category not found</p>
             <p className="text-xs text-muted-foreground">
