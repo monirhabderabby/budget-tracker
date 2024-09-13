@@ -3,13 +3,14 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import dashboardBlack from "../../../public/dash-black.webp";
 import dashboardWhite from "../../../public/dash-white.webp";
+import { BorderBeam } from "../magicui/border-beam";
 
 const BannerImage = () => {
   const { theme } = useTheme();
 
   return (
-    <div>
-      <div className="px-4">
+    <div className="">
+      <div className=" relative">
         <Image
           src={theme === "light" ? dashboardWhite : dashboardBlack}
           alt="dashboard"
@@ -19,6 +20,7 @@ const BannerImage = () => {
           priority
           placeholder="blur"
         />
+        <BorderBeam size={250} duration={12} delay={9} className="rounded-lg" />
       </div>
     </div>
   );
