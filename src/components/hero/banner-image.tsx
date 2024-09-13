@@ -1,6 +1,10 @@
 "use client";
+
+// Packages
 import { useTheme } from "next-themes";
 import Image from "next/image";
+
+// Components
 import dashboardBlack from "../../../public/dash-black.webp";
 import dashboardWhite from "../../../public/dash-white.webp";
 import { BorderBeam } from "../magicui/border-beam";
@@ -20,7 +24,14 @@ const BannerImage = () => {
           priority
           placeholder="blur"
         />
-        <BorderBeam size={250} duration={12} delay={9} className="rounded-lg" />
+        <BorderBeam
+          colorFrom="#fbbf24"
+          colorTo="#f97316"
+          size={250}
+          duration={12}
+          delay={9}
+          className="rounded-lg"
+        />
       </div>
     </div>
   );
