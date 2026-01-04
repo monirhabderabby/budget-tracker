@@ -1,5 +1,5 @@
 import Redis from "ioredis";
 
 export const redis = new Redis(
-  "rediss://default:Ab16AAIncDEwNjU4ZTUwZDQ0NTQ0OTg3YjQ2NTBiMmZhZWQ4NzEwM3AxNDg1MDY@quiet-grackle-48506.upstash.io:6379"
+  "rediss://default:AUloAAIncDJiMzkyZTA2ZjcxMDE0YmFkYTA3ZjZmM2EzOGYzMmE1MXAyMTg3OTI@intimate-moray-18792.upstash.io:6379"
 );
